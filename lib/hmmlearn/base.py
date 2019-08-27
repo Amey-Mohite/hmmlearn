@@ -672,22 +672,24 @@ class _BaseHMM(BaseEstimator):
                 stats['trans'] += np.exp(log_xi_sum)
 
     def _do_mstep(self, stats):
-        """Performs the M-step of EM algorithm.
+    """Performs the M-step of EM algorithm.
 
-        Parameters
-        ----------
-        stats : dict
-            Sufficient statistics updated from all available samples.
-        """
-        # The ``np.where`` calls guard against updating forbidden states
-        # or transitions in e.g. a left-right HMM.
-        if 's' in self.params:
-            startprob_ = self.startprob_prior - 1.0 + stats['start']
-            self.startprob_ = np.where(self.startprob_ == 0.0,
-                                       self.startprob_, startprob_)
-            normalize(self.startprob_)
-        if 't' in self.params:
-            transmat_ = self.transmat_prior - 1.0 + stats['trans']
-            self.transmat_ = np.where(self.transmat_ == 0.0,
-                                      self.transmat_, transmat_)
-            normalize(self.transmat_, axis=1)
+    Parameters
+    ----------
+    stats : dict
+        Sufficient statistics updated from all available samples.
+    """
+    # The ``np.where`` calls guard against updating forbidden states
+    # or transitions in e.g. a left-right HMM.
+		if 's' in self.params:
+			# startprob_ = self.startprob_prior - 1.0 + stats['start']
+			startprob_ = self.startprob_prior + stats['start']
+			self.startprob_ = np.where(self.startprob_ == 0.0,
+                                   self.startprob_, startprob_)
+			normalize(self.startprob_)
+		if 't' in self.params:
+			# transmat_ = self.transmat_prior - 1.0 + stats['trans']
+			transmat_ = self.transmat_prior + stats['trans']
+			self.transmat_ = np.where(self.transmat_ == 0.0,
+                                  self.transmat_, transmat_)
+			normalize(self.transmat_, axis=1)
